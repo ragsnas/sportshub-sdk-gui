@@ -4,9 +4,13 @@ import ReactDOM from 'react-dom';
 import './index.css';
 
 var Bar = require("react-chartjs").Bar;
+var Line = require("react-chartjs").Line;
 
 var apiUrls = {
     getClient: 'http://127.0.0.1:8081/client',
+    getSessionTicks: function(sessionId) {
+      return 'http://127.0.0.1:8081/session/'+ sessionId
+    },  
     getSessionForClientAndYear: function(clientId, year) {
       return 'http://127.0.0.1:8081/client/'+ clientId + '/session/year/'+ year
     },  
@@ -63,10 +67,66 @@ var SportsHubStats = React.createClass({
 
 
 var ClientSession = React.createClass({
+  getInitialState: function() {
+    return {sessionData: undefined};
+  },  
+  loadSessionTicks: function(sessionId) {
+    console.log('loading session #' + sessionId);
+    return jQuery.ajax({
+      url: apiUrls.getSessionTicks(sessionId),
+      dataType: 'json',
+      cache: false,
+      success: function(data) {
+        console.log('data received:', data);
+      },
+      error: function(xhr, status, err) {
+        console.error(this.props.url, status, err.toString());
+      }.bind(this)
+    });    
+  },
+  newSessionDataHandler: function(data) {
+    this.setState({sessionData: data});
+  },
+  getSessionChartData: function() {
+    var item = undefined,
+        speeds = [],
+        labels = [];
+    for(var i=0;i <= this.state.sessionData.length;i++) {
+      item = this.state.sessionData[i];
+      if(item !== undefined) {
+        speeds.push(item.speed);
+        labels.push(item.seconds);
+      }
+    }
+    /*
+    */
+    return {
+      labels: labels,
+      datasets: [{
+        label: "speed",
+        borderWidth: 1,
+        data: speeds
+      }]
+    };
+  },  
+  onClickHandler: function(id) {
+    console.log('clicked:', id);
+    this.loadSessionTicks(id).done(this.newSessionDataHandler);
+  },
   render: function() {
-    return (
+    var SessionLine = undefined;
+    if(this.state.sessionData) {
+      SessionLine = (
         <div>
+          <Line ref="barChart" data={this.getSessionChartData()} width="800" height="150"></Line>
+        </div>
+      );
+    }
+
+    return (
+        <div onClick={() => this.onClickHandler(this.props.session.id)} data-id={this.props.session.id}>
           #{this.props.session.id}: {this.props.session.start}
+          {SessionLine}
         </div>
       );
   }
