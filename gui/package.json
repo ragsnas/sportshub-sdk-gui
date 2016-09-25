@@ -2,5 +2,6 @@
   "name": "node-sportshub-gui",
   "version": "0.0.1",
   "dependencies": {
+    "chart.js": "^2.3.0"
   }
 }

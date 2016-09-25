@@ -20,7 +20,7 @@ var sportshubSettings = {
 	},
 	mqtt: {
     	//host: 'mqtt://test.mosquitto.org',
-	    host: 'mqtt://192.168.1.114',
+	    host: 'mqtt://192.168.1.115',
 	    port: 1883,
 	    username: '',
 	    password: '',

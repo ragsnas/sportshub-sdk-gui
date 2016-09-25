@@ -68,12 +68,33 @@ app.get('/client/:id/session/year/:year', function (req, res) {
     , function(err, rows, fields) {
     if(err) {
       res.status(500);
- 	  res.end( JSON.stringify( {errorMsg: 'MySql Error', error: err} ) );
+    res.end( JSON.stringify( {errorMsg: 'MySql Error', error: err} ) );
       console.error('Problems with MySQL. Error:', err);
     }
     else {
       res.status(200);
- 	  res.end( JSON.stringify( rows ) );
+    res.end( JSON.stringify( rows ) );
+    }
+  });
+});
+
+app.get('/client/:id/session/year/:year/month/:month', function (req, res) {
+  setDefaultHeaders(res);
+  var clientId = parseInt(req.params.id, 10),
+      year = parseInt(req.params.year, 10),
+      month = parseInt(req.params.month, 10);
+  mysqlConnection.query(
+    "SELECT * FROM session WHERE client_id="+clientId+" "
+    +"AND YEAR(start)='"+year+"' AND MONTH(start)='"+month+"'"
+    , function(err, rows, fields) {
+    if(err) {
+      res.status(500);
+    res.end( JSON.stringify( {errorMsg: 'MySql Error', error: err} ) );
+      console.error('Problems with MySQL. Error:', err);
+    }
+    else {
+      res.status(200);
+    res.end( JSON.stringify( rows ) );
     }
   });
 });
